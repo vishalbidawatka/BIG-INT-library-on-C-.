@@ -29,6 +29,8 @@ large_int addition(large_int num1, large_int num2);
 large_int operator+(large_int num1, large_int num2);
 large_int subtraction(large_int num1, large_int num2);
 large_int multipication(large_int num1, large_int num2);
+large_int subtraction_v2(large_int,large_int);
+large_int divison(large_int num1, large_int num2);
 void string_processing(string& str)
 {
     if(str[0] == '-')
@@ -111,7 +113,109 @@ large_int operator*(large_int num1, large_int num2)
     return answer;
   
 }
+large_int gcd(large_int num1, large_int num2)
+{
+    if(num1.num == "0")
+    {
+        return num2;
+    }
+    else if(num1.num == "1" || num2.num == "1")
+    {
+        return large_int("1",false);
+    }
+    else if(num2.num == "0")
+    {
+        return num1;
+    }
+    else if(num1.num == num2.num)
+    {
+        return num1;
+    }
+    else
+    {   large_int sub;
+        while(1)
+        {
+            if(num1.num == "0")
+            {
+                return num2;
+            }
+            if(num2.num == "0")
+            {
+                return num1;
+            }
+            if(num1.num == num2.num)
+            {
+                return num1;
+            }
+            if(num1.num == "1" || num2.num == "1")
+            {
+                return large_int("1",false);
+            }
+            sub = subtraction_v2(num1,num2);
+            num1 = num2;
+            num2 = sub;
+        }
+    }
+    
+}
+large_int divison_main(large_int num1, large_int num2)
+{
+    large_int answer;
+    if(num1.isnegative && !(num2.isnegative))
+    {
+        answer = divison(num1,num2);
+        if(answer.num == "0") return answer;
+        else{
+        answer.num = "-"+answer.num;
+        answer.isnegative = true;
+        }
+    }
+    if(!(num1.isnegative) && num2.isnegative)
+    {
+        answer = divison(num1,num2);
+        if(answer.num == "0") return answer;
+        else{
+        answer.num = "-"+answer.num;
+        answer.isnegative = true;
+        }
+    }
+    if(num1.isnegative && num2.isnegative)
+    {
+        answer = divison(num1,num2);
+    }
+    if(!(num1.isnegative) && !(num2.isnegative))
+    {
+        answer = divison(num1,num2);
+    }
+    return answer;
+}
+large_int divison(large_int num1, large_int num2)
+{   
+    if(num1.num == num2.num)
+    {
+        return large_int("1",false);
+    }
+    string_processing(num1.num);
+    string_processing(num2.num);
+    if(smaller(num1.num,num2.num))
+    {
+        return large_int("0",false);
+    }
+    else
+    {
+    int quotient = 1;
+    large_int remaining = subtraction_v2(num1,num2);
+    //cout<<remaining.num<<"remaining"<<endl;
+    while(smaller(num2.num,remaining.num) || num2.num == remaining.num)
+    {
+        quotient++;
+        remaining = subtraction_v2(remaining,num2);
+    }
+    return large_int(to_string(quotient),false);    
+    
+    }
 
+}
 large_int addition(large_int num1, large_int num2)
 {
     large_int answer;
@@ -270,6 +374,63 @@ large_int subtraction(large_int num1, large_int num2)
     return answer;
    
 }
+large_int subtraction_v2(large_int num1, large_int num2)
+{
+    large_int answer;
+    string padded = "";
+    string num3 = "";
+    string numone = num1.num;
+    string numtwo = num2.num;
+    int negative_flag = 0;
+    if (numone == numtwo)
+    {
+        return large_int("0",false);
+    }
+    string_processing(numone);
+    string_processing(numtwo);
+    if(smaller(numone,numtwo)) 
+    {
+        swap(numone,numtwo);
+        negative_flag = 1;
+    }
+    cout<<numone<<endl;
+    cout<<numtwo<<endl;
+    int borrow = 0;
+    if(numone.size() > numtwo.size())
+    {   
+    padded = padding_by_zero(numtwo, numone);  
+    numtwo = padded;  
+    }
+    else if (numone.size() < numtwo.size())
+    {
+    padded = padding_by_zero(numone,numtwo);
+    numone = padded;
+    }
+    cout<<numone<<endl;
+    cout<<numtwo<<endl;
+    for(int i = numone.size()-1 ; i>-1 ; i--)
+    {
+        int digitdiff = ( numone[i] - '0') - (numtwo[i] - '0') - borrow;
+        cout<<digitdiff<<endl;
+        if(digitdiff < 0)
+        {
+            borrow = 1;
+            digitdiff = digitdiff + 10;
+        }
+        else borrow = 0;
+        num3.insert(0,to_string(digitdiff));
+
+
+    }
+    remove_padding_zeros(num3);
+    answer.num = num3;
+    answer.isnegative = false;
+
+    //answer.length = num3.size();
+    
+    return answer;
+   
+}
 bool isnegative_num(string num)
 {   
 
@@ -343,9 +504,12 @@ int main()
     cin>>one>>two;
     large_int a(one,isnegative_num(one)), b(two,isnegative_num(two));
     //large_int c = a-b;
-    large_int d = a*b;
+    //large_int d = a*b;
+    //large_int x = gcd(a,b);
     //large_int mul = multipication(a,b);
-    cout<<d.num<<endl;
+    large_int x = divison_main(a,b);
+    cout<<x.num<<endl;
+    //cout<<d.num<<endl;
     //cout<<c.num<<endl;
     //cout<<mul.num;
     //cout<<c.num;
